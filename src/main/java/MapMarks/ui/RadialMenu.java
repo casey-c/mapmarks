@@ -46,6 +46,7 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
 //                        new RadialMenuObject(EaselColorHelper.fromHexString("cdb156"), EaselColorHelper.fromHexString("403a27")) // yellow
 //                )
                 Arrays.asList(
+//                        new RadialMenuObject(Color.CORAL, Color.LIME), // test
                         new RadialMenuObject(ColorDatabase.DEFAULT_GRAY, ColorDatabase.DEFAULT_GRAY_DIMMED), // light gray
                         new RadialMenuObject(ColorDatabase.DEFAULT_RED, ColorDatabase.DEFAULT_RED_DIMMED), // red
                         new RadialMenuObject(ColorDatabase.DEFAULT_GREEN, ColorDatabase.DEFAULT_GREEN_DIMMED), // green
