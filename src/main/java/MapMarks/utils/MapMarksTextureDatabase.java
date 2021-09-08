@@ -7,6 +7,10 @@ public enum MapMarksTextureDatabase implements ITextureDatabaseEnum {
     LEGEND_BASE("MapMarks/textures/legend_base.png"),
     LEGEND_TRIM("MapMarks/textures/legend_trim.png"),
 
+    MAP_TILE_BASE("MapMarks/textures/tile/base.png"),
+    MAP_TILE_TRIM("MapMarks/textures/tile/trim.png"),
+    MAP_TILE_SHADOW("MapMarks/textures/tile/shadow.png"),
+
     RADIAL_BASE("MapMarks/textures/radial_base.png"),
     RADIAL_TRIM("MapMarks/textures/radial_trim.png")
     ;
