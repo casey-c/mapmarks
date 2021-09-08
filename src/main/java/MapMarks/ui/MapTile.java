@@ -9,6 +9,7 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 import easel.ui.graphics.LayeredTextureWidget;
+import easel.utils.colors.EaselColors;
 
 public class MapTile extends AbstractWidget<MapTile> {
     // Not statically defined because I'm probably going to mess with the tile images a ton still
@@ -18,7 +19,7 @@ public class MapTile extends AbstractWidget<MapTile> {
 
     private LayeredTextureWidget ltw;
 
-    private static final Color baseColor =  Color.WHITE;
+    private static final Color baseColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.2f);
     private static final Color trimColor = ColorDatabase.UI_TRIM;
 
     public MapTile() {

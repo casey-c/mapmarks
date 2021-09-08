@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
-import easel.utils.EaselColorHelper;
 import easel.utils.EaselInputHelper;
+import easel.utils.colors.EaselColors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
     private ArrayList<RadialMenuObject> objects;
     private RadialMenuObject centerObject;
 
-    private static Color centerDefaultColor = EaselColorHelper.fromHexString("8d8c80");
+    private static Color centerDefaultColor = EaselColors.fromHexString("8d8c80");
 
     int selectedIndex = -1;
 
