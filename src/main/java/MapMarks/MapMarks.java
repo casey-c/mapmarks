@@ -18,6 +18,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AnchorPosition;
 import easel.utils.EaselSoundHelper;
+import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +48,9 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
         menu = new RadialMenu();
         legendObject = new LegendObject()
                 .onLeftClick(onClick -> {
-                    EaselSoundHelper.cawCaw();
+//                    EaselSoundHelper.cawCaw();
+                    EaselSoundHelper.uiClick1();
+                    MapTileManager.clearAllHighlights();
                 })
                 .anchoredAt(1575, 767, AnchorPosition.CENTER)
         ;
@@ -84,16 +87,24 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
             rightMouseDown = true;
 
             if (MapTileManager.isAnyTileHovered()) {
+                // Preexisting highlighted tile under cursor where we start clicking
                 if (MapTileManager.hoveredTileIsHighlighted()) {
-                    // TODO: start unhighlighting everything, starting with this hovered highlighted node
-                    rightMouseDownMode = RightMouseDownMode.UNHIGHLIGHTING;
-
-                    MapTileManager.setHoveredTileHighlightStatus(false);
+                    // Check if we're doing a repaint (TODO: config option)
+                    if (MapTileManager.isARepaint()) {
+                        // start highlighting everything, starting with this hovered unhighlighted node
+                        rightMouseDownMode = RightMouseDownMode.HIGHLIGHTING;
+                        MapTileManager.setHoveredTileHighlightStatus(true);
+                    }
+                    else {
+                        // start unhighlighting everything, starting with this hovered highlighted node
+                        rightMouseDownMode = RightMouseDownMode.UNHIGHLIGHTING;
+                        MapTileManager.setHoveredTileHighlightStatus(false);
+                    }
                 }
+                // Tile under cursor exists, but is not highlighted
                 else {
-                    // TODO: start highlighting everything, starting with this hovered unhighlighted node
+                    // start highlighting everything, starting with this hovered unhighlighted node
                     rightMouseDownMode = RightMouseDownMode.HIGHLIGHTING;
-
                     MapTileManager.setHoveredTileHighlightStatus(true);
                 }
             }
@@ -124,6 +135,8 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                 if (selectedIndex != -1 && selectedIndex != previouslySelectedIndex) {
                     Color newColor = menu.getSelectedColorOrDefault();
                     legendObject.setColor(newColor);
+
+                    MapTileManager.setHighlightingColor(EaselColors.withOpacity(newColor, 0.2f));
 
                     previouslySelectedIndex = selectedIndex;
                 }

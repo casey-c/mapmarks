@@ -1,12 +1,14 @@
 package MapMarks;
 
 import MapMarks.ui.MapTile;
+import MapMarks.utils.ColorDatabase;
 import MapMarks.utils.SoundHelper;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import easel.ui.AnchorPosition;
 import easel.utils.EaselSoundHelper;
+import easel.utils.colors.EaselColors;
 
 import java.util.HashMap;
 
@@ -38,7 +40,7 @@ public class MapTileManager {
         MapTile tile;
         RoomType type;
 
-        boolean isHighlighted = true;
+        boolean isHighlighted = false;
 
         public MapTileMapObject(MapRoomNode node) {
             this.type = RoomType.fromSymbol(node.getRoomSymbol(true));
@@ -98,15 +100,40 @@ public class MapTileManager {
 
     public static void setHoveredTileHighlightStatus(boolean val) {
         if (inbounds != null) {
+            // Changing highlight status always succeeds
             if (inbounds.isHighlighted != val) {
                 inbounds.isHighlighted = val;
+                inbounds.tile.setBaseColor(highlightingColor);
+                SoundHelper.playMapScratchSound();
+            }
+            // Already highlighted has further attempts to highlight: only allow if there is a color change
+            // TODO: config option? [enable instant repaint]
+            else if (val && isARepaint()) {
+            //else if (val && inbounds.tile.getBaseColor() != highlightingColor) {
+                inbounds.tile.setBaseColor(highlightingColor);
                 SoundHelper.playMapScratchSound();
             }
         }
     }
 
-    private static Color highlightingColor;
+    /**
+     * @return whether the inbounds tile has a different color than the highlighting color
+     */
+    public static boolean isARepaint() {
+        if (inbounds != null) {
+            return inbounds.tile.getBaseColor() != highlightingColor;
+        }
+        return false;
+    }
+
+    private static Color highlightingColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.2f);
     public static void setHighlightingColor(Color color) {
         highlightingColor = color;
+    }
+
+    public static void clearAllHighlights() {
+        for (MapTileMapObject obj : tracked.values()) {
+            obj.isHighlighted = false;
+        }
     }
 }
