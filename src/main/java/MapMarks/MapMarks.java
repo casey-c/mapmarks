@@ -5,6 +5,7 @@ import MapMarks.ui.RadialMenu;
 import MapMarks.utils.MapMarksTextureDatabase;
 import MapMarks.utils.SoundHelper;
 import basemod.BaseMod;
+import basemod.interfaces.AddAudioSubscriber;
 import basemod.interfaces.PostInitializeSubscriber;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
@@ -19,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @SpireInitializer
-public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber, RenderSubscriber {
+public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber, RenderSubscriber, AddAudioSubscriber {
     public static final Logger logger = LogManager.getLogger(MapMarks.class);
 
     public static void initialize() {
@@ -47,6 +48,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                 })
                 .anchoredAt(1575, 767, AnchorPosition.CENTER)
         ;
+
     }
 
     @Override
@@ -55,6 +57,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
     }
 
     private boolean rightMouseDown = false;
+    private int previouslySelectedIndex = -1;
 
     @Override
     public void receivePostUpdate() {
@@ -70,13 +73,22 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
 
             System.out.println("Menu closed. Selected index is: " + menu.getSelectedIndex());
 
-            //
-            if (menu.getSelectedIndex() != -1) {
+            // Update the results with the new selection
+            int selectedIndex = menu.getSelectedIndex();
+
+            if (selectedIndex != -1 && selectedIndex != previouslySelectedIndex) {
                 Color newColor = menu.getSelectedColorOrDefault();
                 legendObject.setColor(newColor);
+
+                previouslySelectedIndex = selectedIndex;
             }
         }
 
         menu.update();
+    }
+
+    @Override
+    public void receiveAddAudio() {
+        BaseMod.addAudio("MAP_MARKS_CLICK", "MapMarks/output_2.wav");
     }
 }

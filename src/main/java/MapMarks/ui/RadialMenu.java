@@ -2,6 +2,7 @@ package MapMarks.ui;
 
 import MapMarks.MapMarks;
 import MapMarks.utils.ColorDatabase;
+import MapMarks.utils.SoundHelper;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AbstractWidget;
@@ -84,8 +85,7 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
     public Color getSelectedColorOrDefault() {
         if (selectedIndex != -1) {
             return objects.get(selectedIndex).getBaseColor();
-        }
-        else {
+        } else {
             return objects.get(1).getBaseColor();
         }
     }
@@ -163,22 +163,29 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
             float distanceFromStart = (float) Math.sqrt(dx * dx + dy * dy);
 
             if (distanceFromStart > THRESHOLD) {
-                this.selectedIndex = computeClosestObjectIndex((float) Math.atan2(dy, dx));
+                int nextSelectedIndex = computeClosestObjectIndex((float) Math.atan2(dy, dx));
 
-                if (selectedIndex != -1) {
-                    RadialMenuObject selected = objects.get(selectedIndex);
-                    selected.setDimmed(false);
+                // Selection changed
+                if (nextSelectedIndex != selectedIndex) {
+                    this.selectedIndex = nextSelectedIndex;
+
+                    if (selectedIndex != -1) {
+                        SoundHelper.playRadialChangeSound(selectedIndex, objects.size());
+
+                        RadialMenuObject selected = objects.get(selectedIndex);
+                        selected.setDimmed(false);
+                        MapMarks.legendObject.setColor(selected.getBaseColor());
 //                    centerObject.setBaseColor(selected.getBaseColor());
 
-                    // Dim the rest
-                    for (int i = 0; i < objects.size(); ++i) {
-                        if (i != selectedIndex) {
-                            objects.get(i).setDimmed(true);
+                        // Dim the rest
+                        for (int i = 0; i < objects.size(); ++i) {
+                            if (i != selectedIndex) {
+                                objects.get(i).setDimmed(true);
+                            }
                         }
                     }
                 }
-            }
-            else {
+            } else {
 //                centerObject.setBaseColor(centerDefaultColor);
                 objects.forEach(object -> object.setDimmed(false));
                 selectedIndex = -1;
