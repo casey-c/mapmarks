@@ -8,7 +8,6 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 import easel.ui.graphics.LayeredTextureWidget;
-import easel.utils.EaselColorHelper;
 
 public class RadialMenuObject extends AbstractWidget<RadialMenuObject> {
     private LayeredTextureWidget ltw;

@@ -1,6 +1,7 @@
 package MapMarks;
 
 import MapMarks.ui.LegendObject;
+import MapMarks.ui.MapTile;
 import MapMarks.ui.RadialMenu;
 import MapMarks.utils.MapMarksTextureDatabase;
 import MapMarks.utils.SoundHelper;
@@ -12,6 +13,8 @@ import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AnchorPosition;
 import easel.utils.EaselSoundHelper;
@@ -59,29 +62,81 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
     private boolean rightMouseDown = false;
     private int previouslySelectedIndex = -1;
 
+    private enum RightMouseDownMode {
+        RADIAL_MENU, HIGHLIGHTING, UNHIGHLIGHTING, NONE;
+    }
+
+    private RightMouseDownMode rightMouseDownMode = RightMouseDownMode.NONE;
+
     @Override
     public void receivePostUpdate() {
+        // No updates required if we're not on the map screen
+        if (!CardCrawlGame.isInARun() || AbstractDungeon.screen != AbstractDungeon.CurrentScreen.MAP) {
+            rightMouseDownMode = RightMouseDownMode.NONE;
+            return;
+        }
+
+        // Update tile manager
+        MapTileManager.updateAllTracked();
+
+        // Transition: Started right clicking
         if (InputHelper.isMouseDown_R && !rightMouseDown) {
             rightMouseDown = true;
 
-            SoundHelper.playRadialOpenSound();
-            menu.open();
-        } else if (!InputHelper.isMouseDown_R && rightMouseDown) {
-            rightMouseDown = false;
-            menu.close();
-            SoundHelper.playRadialCloseSound();
+            if (MapTileManager.isAnyTileHovered()) {
+                if (MapTileManager.hoveredTileIsHighlighted()) {
+                    // TODO: start unhighlighting everything, starting with this hovered highlighted node
+                    rightMouseDownMode = RightMouseDownMode.UNHIGHLIGHTING;
 
-            System.out.println("Menu closed. Selected index is: " + menu.getSelectedIndex());
+                    MapTileManager.setHoveredTileHighlightStatus(false);
+                }
+                else {
+                    // TODO: start highlighting everything, starting with this hovered unhighlighted node
+                    rightMouseDownMode = RightMouseDownMode.HIGHLIGHTING;
 
-            // Update the results with the new selection
-            int selectedIndex = menu.getSelectedIndex();
-
-            if (selectedIndex != -1 && selectedIndex != previouslySelectedIndex) {
-                Color newColor = menu.getSelectedColorOrDefault();
-                legendObject.setColor(newColor);
-
-                previouslySelectedIndex = selectedIndex;
+                    MapTileManager.setHoveredTileHighlightStatus(true);
+                }
             }
+            else {
+                // Not on a node, so we can open the radial menu
+                SoundHelper.playRadialOpenSound();
+                menu.open();
+
+                rightMouseDownMode = RightMouseDownMode.RADIAL_MENU;
+            }
+
+        }
+        // Transition: Stopped right clicking
+        else if (!InputHelper.isMouseDown_R && rightMouseDown) {
+            rightMouseDown = false;
+            rightMouseDownMode = RightMouseDownMode.NONE;
+
+            // Finalize the radial menu
+            if (menu.isMenuOpen()) {
+                menu.close();
+                SoundHelper.playRadialCloseSound();
+
+                System.out.println("Menu closed. Selected index is: " + menu.getSelectedIndex());
+
+                // Update the results with the new selection
+                int selectedIndex = menu.getSelectedIndex();
+
+                if (selectedIndex != -1 && selectedIndex != previouslySelectedIndex) {
+                    Color newColor = menu.getSelectedColorOrDefault();
+                    legendObject.setColor(newColor);
+
+                    previouslySelectedIndex = selectedIndex;
+                }
+            }
+
+        }
+        // Currently right mouse is held and we're highlighting
+        else if (rightMouseDownMode == RightMouseDownMode.HIGHLIGHTING) {
+            MapTileManager.setHoveredTileHighlightStatus(true);
+        }
+        // Currently right mouse is held and we're unhighlighting
+        else if (rightMouseDownMode == RightMouseDownMode.UNHIGHLIGHTING) {
+            MapTileManager.setHoveredTileHighlightStatus(false);
         }
 
         menu.update();

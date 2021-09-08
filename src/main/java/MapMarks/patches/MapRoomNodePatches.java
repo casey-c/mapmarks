@@ -63,8 +63,13 @@ public class MapRoomNodePatches {
             return node.y * Settings.MAP_DST_Y + OFFSET_Y + DungeonMapScreen.offsetY - 64.0f + node.offsetY;
         }
 
-//        @SpirePostfixPatch
-//        public static void Postfix(MapRoomNode node, SpriteBatch sb) {
+        @SpirePostfixPatch
+        public static void Postfix(MapRoomNode node, SpriteBatch sb) {
+            MapTileManager.tryRender(sb,
+                    node,
+                    computeXFromNode(node) / Settings.xScale,
+                    computeYFromNode(node) / Settings.scale);
+        }
 //            // TODO: render just before this line (near the start of MapRoomNode::render)
 //            //   [will need an instrument patch probably]
 //            // this.renderEmeraldVfx(sb);
@@ -91,26 +96,26 @@ public class MapRoomNodePatches {
 ////                    false);
 //        }
 
-        private static final String replacement =
-                "{ "
-//                        + "$1 = "
-//                        + "float tileX = " + MapRoomNodeRenderPatch.class.getName() + ".computeXFromNode(this);"
-//                        + "float tileY = " + MapRoomNodeRenderPatch.class.getName() + ".computeYFromNode(this);"
-//                        + MapTileManager.class.getName() + ".tryRender(sb, this, tileX / Settings.xScale, tileY / Settings.scale);"
-//                        + MapTileManager.class.getName() + ".tryRender(sb, this, MapRoomNodeRenderPatch.computeXFromNode(this) / Settings.xScale, MapRoomNodeRenderPatch.computeYFromNode(this) / Settings.scale);"
-                        + MapTileManager.class.getName() + ".tryRender(sb, this, " + MapRoomNodeRenderPatch.class.getName() + ".computeXFromNode(this) / " + Settings.class.getName() + ".xScale, " + MapRoomNodeRenderPatch.class.getName() + ".computeYFromNode(this) / " + Settings.class.getName() + ".scale);"
-                        + "$_ = $proceed($$);"
-                        + " }";
-
-        public static ExprEditor Instrument() {
-            return new ExprEditor() {
-                @Override
-                public void edit(MethodCall m) throws CannotCompileException {
-                    if (m.getClassName().equals(MapRoomNode.class.getName()) && m.getMethodName().equals("renderEmeraldVfx")) {
-                        m.replace(replacement);
-                    }
-                }
-            };
-        }
+//        private static final String replacement =
+//                "{ "
+////                        + "$1 = "
+////                        + "float tileX = " + MapRoomNodeRenderPatch.class.getName() + ".computeXFromNode(this);"
+////                        + "float tileY = " + MapRoomNodeRenderPatch.class.getName() + ".computeYFromNode(this);"
+////                        + MapTileManager.class.getName() + ".tryRender(sb, this, tileX / Settings.xScale, tileY / Settings.scale);"
+////                        + MapTileManager.class.getName() + ".tryRender(sb, this, MapRoomNodeRenderPatch.computeXFromNode(this) / Settings.xScale, MapRoomNodeRenderPatch.computeYFromNode(this) / Settings.scale);"
+//                        + MapTileManager.class.getName() + ".tryRender(sb, this, " + MapRoomNodeRenderPatch.class.getName() + ".computeXFromNode(this) / " + Settings.class.getName() + ".xScale, " + MapRoomNodeRenderPatch.class.getName() + ".computeYFromNode(this) / " + Settings.class.getName() + ".scale);"
+//                        + "$_ = $proceed($$);"
+//                        + " }";
+//
+//        public static ExprEditor Instrument() {
+//            return new ExprEditor() {
+//                @Override
+//                public void edit(MethodCall m) throws CannotCompileException {
+//                    if (m.getClassName().equals(MapRoomNode.class.getName()) && m.getMethodName().equals("renderEmeraldVfx")) {
+//                        m.replace(replacement);
+//                    }
+//                }
+//            };
+//        }
     }
 }

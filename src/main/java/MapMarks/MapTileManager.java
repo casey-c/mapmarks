@@ -1,9 +1,12 @@
 package MapMarks;
 
 import MapMarks.ui.MapTile;
+import MapMarks.utils.SoundHelper;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import easel.ui.AnchorPosition;
+import easel.utils.EaselSoundHelper;
 
 import java.util.HashMap;
 
@@ -40,8 +43,16 @@ public class MapTileManager {
         public MapTileMapObject(MapRoomNode node) {
             this.type = RoomType.fromSymbol(node.getRoomSymbol(true));
 
-            // TODO: no way this is going to be correct
-            this.tile = new MapTile();
+            this.tile = new MapTile()
+//                    .onMouseEnter(tile -> {
+//                                EaselSoundHelper.uiClick1();
+//                            }
+//                    )
+//                    .onMouseLeave(tile -> {
+//                                EaselSoundHelper.uiClick2();
+//                            }
+//                    )
+            ;
         }
     }
 
@@ -55,10 +66,47 @@ public class MapTileManager {
 
     public static void tryRender(SpriteBatch sb, MapRoomNode node, float x, float y) {
         MapTileMapObject tileObject = tracked.get(node);
-        if (tileObject != null && tileObject.isHighlighted) {
-            tileObject.tile
-                    .anchoredAt(x + 67.0f, y + 60.0f, AnchorPosition.CENTER)
-                    .render(sb);
+        if (tileObject != null) {
+            tileObject.tile.anchoredAt(x + 67.0f, y + 60.0f, AnchorPosition.CENTER);
+
+            if (tileObject.isHighlighted)
+                tileObject.tile.render(sb);
         }
+    }
+
+    private static MapTileMapObject inbounds = null;
+
+    public static void updateAllTracked() {
+        inbounds = null;
+
+        for (MapTileMapObject obj : tracked.values()) {
+            obj.tile.update();
+
+            if (obj.tile.isMouseInContentBounds()) {
+                inbounds = obj;
+            }
+        }
+    }
+
+    public static boolean isAnyTileHovered() {
+        return inbounds != null;
+    }
+
+    public static boolean hoveredTileIsHighlighted() {
+        return (inbounds != null && inbounds.isHighlighted);
+    }
+
+    public static void setHoveredTileHighlightStatus(boolean val) {
+        if (inbounds != null) {
+            if (inbounds.isHighlighted != val) {
+                inbounds.isHighlighted = val;
+                SoundHelper.playMapScratchSound();
+            }
+        }
+    }
+
+    private static Color highlightingColor;
+    public static void setHighlightingColor(Color color) {
+        highlightingColor = color;
     }
 }

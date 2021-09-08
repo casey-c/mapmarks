@@ -78,6 +78,10 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
         isOpen = false;
     }
 
+    public boolean isMenuOpen() {
+        return isOpen;
+    }
+
     public int getSelectedIndex() {
         return selectedIndex;
     }

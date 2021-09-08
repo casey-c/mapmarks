@@ -19,7 +19,7 @@ public class MapTile extends AbstractWidget<MapTile> {
 
     private LayeredTextureWidget ltw;
 
-    private static final Color baseColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.2f);
+    private Color baseColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.2f);
     private static final Color trimColor = ColorDatabase.UI_TRIM;
 
     public MapTile() {
@@ -34,6 +34,17 @@ public class MapTile extends AbstractWidget<MapTile> {
                 .withLayer(MapMarksTextureDatabase.MAP_TILE_TRIM.getTexture(), trimColor)
         ;
 
+    }
+
+    public void setBaseColor(Color baseColor) {
+        if (this.baseColor != baseColor) {
+            this.baseColor = baseColor;
+            this.ltw.withLayerColor(1, baseColor);
+        }
+    }
+
+    public Color getBaseColor() {
+        return baseColor;
     }
 
     @Override public float getContentWidth() { return WIDTH; }
