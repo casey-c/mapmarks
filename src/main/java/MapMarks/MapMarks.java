@@ -1,7 +1,6 @@
 package MapMarks;
 
 import MapMarks.ui.LegendObject;
-import MapMarks.ui.MapTile;
 import MapMarks.ui.RadialMenu;
 import MapMarks.utils.MapMarksTextureDatabase;
 import MapMarks.utils.SoundHelper;
@@ -14,14 +13,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
+import com.megacrit.cardcrawl.map.LegendItem;
 import easel.ui.AnchorPosition;
 import easel.utils.EaselSoundHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
 
 @SpireInitializer
 public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber, RenderSubscriber, AddAudioSubscriber {
@@ -47,13 +50,16 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
 
         menu = new RadialMenu();
         legendObject = new LegendObject()
-                .onLeftClick(onClick -> {
-//                    EaselSoundHelper.cawCaw();
-                    EaselSoundHelper.uiClick1();
+                .onRightClick(onClick -> {
+                    EaselSoundHelper.uiClick2();
                     MapTileManager.clearAllHighlights();
                 })
                 .anchoredAt(1575, 767, AnchorPosition.CENTER)
         ;
+
+        System.out.println("Settings.xScale: " + Settings.xScale);
+        System.out.println("Settings.yScale: " + Settings.yScale);
+        System.out.println("Settings.scale: " + Settings.scale);
 
     }
 
@@ -94,8 +100,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                         // start highlighting everything, starting with this hovered unhighlighted node
                         rightMouseDownMode = RightMouseDownMode.HIGHLIGHTING;
                         MapTileManager.setHoveredTileHighlightStatus(true);
-                    }
-                    else {
+                    } else {
                         // start unhighlighting everything, starting with this hovered highlighted node
                         rightMouseDownMode = RightMouseDownMode.UNHIGHLIGHTING;
                         MapTileManager.setHoveredTileHighlightStatus(false);
@@ -107,13 +112,26 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                     rightMouseDownMode = RightMouseDownMode.HIGHLIGHTING;
                     MapTileManager.setHoveredTileHighlightStatus(true);
                 }
-            }
-            else {
-                // Not on a node, so we can open the radial menu
-                SoundHelper.playRadialOpenSound();
-                menu.open();
+            } else {
+                boolean okayToOpenRadial = !MapMarks.legendObject.isMouseInContentBounds();
 
-                rightMouseDownMode = RightMouseDownMode.RADIAL_MENU;
+                // Probably overly zealous null checking here for no reason
+                if (CardCrawlGame.isInARun() && AbstractDungeon.dungeonMapScreen != null && AbstractDungeon.dungeonMapScreen.map != null && AbstractDungeon.dungeonMapScreen.map.legend != null) {
+                    for (LegendItem item : AbstractDungeon.dungeonMapScreen.map.legend.items) {
+                        if (item.hb.hovered) {
+                            okayToOpenRadial = false;
+                            break;
+                        }
+                    }
+                }
+
+                // Not on a node, a legend item, or the legend color display object, so we can open the radial menu
+                if (okayToOpenRadial) {
+                    SoundHelper.playRadialOpenSound();
+                    menu.open();
+
+                    rightMouseDownMode = RightMouseDownMode.RADIAL_MENU;
+                }
             }
 
         }

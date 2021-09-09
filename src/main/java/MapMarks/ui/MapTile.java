@@ -9,6 +9,7 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 import easel.ui.graphics.LayeredTextureWidget;
+import easel.utils.EaselGraphicsHelper;
 import easel.utils.colors.EaselColors;
 
 public class MapTile extends AbstractWidget<MapTile> {
@@ -60,5 +61,9 @@ public class MapTile extends AbstractWidget<MapTile> {
     @Override
     protected void renderWidget(SpriteBatch sb) {
         ltw.render(sb);
+
+//        EaselGraphicsHelper.drawDebugRects(sb, this);
+//        if (hb != null)
+//            hb.render(sb);
     }
 }
