@@ -1,6 +1,7 @@
 package MapMarks.ui;
 
 import MapMarks.utils.ColorDatabase;
+import MapMarks.utils.ColorEnum;
 import MapMarks.utils.MapMarksTextureDatabase;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,23 +15,53 @@ public class RadialMenuObject extends AbstractWidget<RadialMenuObject> {
     protected static final float WIDTH = 118;
     protected static final float HEIGHT = 108;
 
+//    private Color baseColor;
+//    private Color dimColor;
+    private ColorEnum color;
+
     private Color baseColor;
     private Color dimColor;
 
     private boolean isDimmed = false;
 
-    public RadialMenuObject(Color baseColor, Color dimColor) {
-        this.baseColor = baseColor;
-        this.dimColor = dimColor;
+    public RadialMenuObject(Color special) {
+        this.color = ColorEnum.WHITE;
+
+        this.baseColor = special;
+        this.dimColor = special;
 
         ltw = new LayeredTextureWidget(WIDTH, HEIGHT)
-                .withLayer(MapMarksTextureDatabase.RADIAL_BASE.getTexture(), this.baseColor)
+                .withLayer(MapMarksTextureDatabase.RADIAL_BASE.getTexture(), baseColor)
                 .withLayer(MapMarksTextureDatabase.RADIAL_TRIM.getTexture(), ColorDatabase.UI_TRIM);
     }
 
-    public Color getBaseColor() {
-        return baseColor;
+    public RadialMenuObject(ColorEnum color) {
+        this.color = color;
+
+        this.baseColor = color.get();
+        this.dimColor = color.getDimmed();
+
+        ltw = new LayeredTextureWidget(WIDTH, HEIGHT)
+                .withLayer(MapMarksTextureDatabase.RADIAL_BASE.getTexture(), baseColor)
+                .withLayer(MapMarksTextureDatabase.RADIAL_TRIM.getTexture(), ColorDatabase.UI_TRIM);
     }
+
+//    public RadialMenuObject(Color baseColor, Color dimColor) {
+//        this.baseColor = baseColor;
+//        this.dimColor = dimColor;
+//
+//        ltw = new LayeredTextureWidget(WIDTH, HEIGHT)
+//                .withLayer(MapMarksTextureDatabase.RADIAL_BASE.getTexture(), this.baseColor)
+//                .withLayer(MapMarksTextureDatabase.RADIAL_TRIM.getTexture(), ColorDatabase.UI_TRIM);
+//    }
+
+    public ColorEnum getColor() {
+        return color;
+    }
+
+//    public Color getBaseColor() {
+//        return baseColor;
+//    }
 //
 //    public void setBaseColor(Color baseColor) {
 //        this.baseColor = baseColor;

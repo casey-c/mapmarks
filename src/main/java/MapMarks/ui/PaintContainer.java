@@ -103,7 +103,7 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
                 previousUpdateTime = currTime;
 
                 // Enough time has passed since previous update, so we can draw a blob
-                addBlob(MapMarks.legendObject.getColor());
+                addBlob(MapMarks.legendObject.getColor().get());
             }
         }
     }

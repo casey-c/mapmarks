@@ -3,6 +3,7 @@ package MapMarks;
 import MapMarks.ui.LegendObject;
 import MapMarks.ui.PaintContainer;
 import MapMarks.ui.RadialMenu;
+import MapMarks.utils.ColorEnum;
 import MapMarks.utils.MapMarksTextureDatabase;
 import MapMarks.utils.SoundHelper;
 import basemod.BaseMod;
@@ -173,10 +174,11 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                 int selectedIndex = menu.getSelectedIndex();
 
                 if (selectedIndex != -1 && selectedIndex != previouslySelectedIndex) {
-                    Color newColor = menu.getSelectedColorOrDefault();
+                    ColorEnum newColor = menu.getSelectedColorOrDefault();
                     legendObject.setColor(newColor);
 
-                    MapTileManager.setHighlightingColor(EaselColors.withOpacity(newColor, 0.8f));
+                    //MapTileManager.setHighlightingColor(EaselColors.withOpacity(newColor.get(), 0.8f));
+                    MapTileManager.setHighlightingColor(newColor.get());
 
                     previouslySelectedIndex = selectedIndex;
                 }

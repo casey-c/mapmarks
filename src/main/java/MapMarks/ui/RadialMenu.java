@@ -2,6 +2,7 @@ package MapMarks.ui;
 
 import MapMarks.MapMarks;
 import MapMarks.utils.ColorDatabase;
+import MapMarks.utils.ColorEnum;
 import MapMarks.utils.SoundHelper;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -46,21 +47,37 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
 //                        new RadialMenuObject(EaselColorHelper.fromHexString("ab30ba"), EaselColorHelper.fromHexString("3d2b3f")), // purple
 //                        new RadialMenuObject(EaselColorHelper.fromHexString("cdb156"), EaselColorHelper.fromHexString("403a27")) // yellow
 //                )
+//                Arrays.asList(
+////                        new RadialMenuObject(Color.CORAL, Color.LIME), // test
+//                        new RadialMenuObject(ColorDatabase.DEFAULT_GRAY, ColorDatabase.DEFAULT_GRAY_DIMMED), // light gray
+//                        new RadialMenuObject(ColorDatabase.DEFAULT_RED, ColorDatabase.DEFAULT_RED_DIMMED), // red
+//                        new RadialMenuObject(ColorDatabase.DEFAULT_GREEN, ColorDatabase.DEFAULT_GREEN_DIMMED), // green
+//                        new RadialMenuObject(ColorDatabase.DEFAULT_BLUE, ColorDatabase.DEFAULT_BLUE_DIMMED), // blue
+//                        new RadialMenuObject(ColorDatabase.DEFAULT_PURPLE, ColorDatabase.DEFAULT_PURPLE_DIMMED), // purple
+//                        new RadialMenuObject(ColorDatabase.DEFAULT_YELLOW, ColorDatabase.DEFAULT_YELLOW_DIMMED) // yellow
+//                )
+//                Arrays.asList(
+//                        new RadialMenuObject(ColorEnum.WHITE.get(), ColorEnum.WHITE.getDimmed()), // light gray
+//                        new RadialMenuObject(ColorEnum.RED.get(), ColorEnum.RED.getDimmed()), // red
+//                        new RadialMenuObject(ColorEnum.GREEN.get(), ColorEnum.GREEN.getDimmed()), // green
+//                        new RadialMenuObject(ColorEnum.BLUE.get(), ColorEnum.BLUE.getDimmed()), // blue
+//                        new RadialMenuObject(ColorEnum.PURPLE.get(), ColorEnum.PURPLE.getDimmed()), // purple
+//                        new RadialMenuObject(ColorEnum.YELLOW.get(), ColorEnum.YELLOW.getDimmed()) // yellow
+//                )
                 Arrays.asList(
-//                        new RadialMenuObject(Color.CORAL, Color.LIME), // test
-                        new RadialMenuObject(ColorDatabase.DEFAULT_GRAY, ColorDatabase.DEFAULT_GRAY_DIMMED), // light gray
-                        new RadialMenuObject(ColorDatabase.DEFAULT_RED, ColorDatabase.DEFAULT_RED_DIMMED), // red
-                        new RadialMenuObject(ColorDatabase.DEFAULT_GREEN, ColorDatabase.DEFAULT_GREEN_DIMMED), // green
-                        new RadialMenuObject(ColorDatabase.DEFAULT_BLUE, ColorDatabase.DEFAULT_BLUE_DIMMED), // blue
-                        new RadialMenuObject(ColorDatabase.DEFAULT_PURPLE, ColorDatabase.DEFAULT_PURPLE_DIMMED), // purple
-                        new RadialMenuObject(ColorDatabase.DEFAULT_YELLOW, ColorDatabase.DEFAULT_YELLOW_DIMMED) // yellow
+                        new RadialMenuObject(ColorEnum.WHITE),
+                        new RadialMenuObject(ColorEnum.RED),
+                        new RadialMenuObject(ColorEnum.GREEN),
+                        new RadialMenuObject(ColorEnum.BLUE),
+                        new RadialMenuObject(ColorEnum.PURPLE),
+                        new RadialMenuObject(ColorEnum.YELLOW)
                 )
         );
 
         thetaDelta = (2.0f * PI) / objects.size();
         thetaStart = (PI / 2.0f) - thetaDelta;
 
-        centerObject = new RadialMenuObject(centerDefaultColor, centerDefaultColor);
+        centerObject = new RadialMenuObject(centerDefaultColor);
     }
 
     public void open() {
@@ -86,11 +103,11 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
         return selectedIndex;
     }
 
-    public Color getSelectedColorOrDefault() {
+    public ColorEnum getSelectedColorOrDefault() {
         if (selectedIndex != -1) {
-            return objects.get(selectedIndex).getBaseColor();
+            return objects.get(selectedIndex).getColor();
         } else {
-            return objects.get(1).getBaseColor();
+            return objects.get(1).getColor();
         }
     }
 
@@ -178,7 +195,7 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
 
                         RadialMenuObject selected = objects.get(selectedIndex);
                         selected.setDimmed(false);
-                        MapMarks.legendObject.setColor(selected.getBaseColor());
+                        MapMarks.legendObject.setColor(selected.getColor());
 //                    centerObject.setBaseColor(selected.getBaseColor());
 
                         // Dim the rest

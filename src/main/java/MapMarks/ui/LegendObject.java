@@ -1,6 +1,7 @@
 package MapMarks.ui;
 
 import MapMarks.utils.ColorDatabase;
+import MapMarks.utils.ColorEnum;
 import MapMarks.utils.MapMarksTextureDatabase;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,7 +25,8 @@ public class LegendObject extends AbstractWidget<LegendObject> {
     private static Color DIM_COLOR = Color.valueOf("ffffff47");
     private static Color HIGHLIGHT_COLOR = Color.valueOf("ffffff3d");
 
-    private Color baseColor = ColorDatabase.DEFAULT_RED;
+//    private Color baseColor = ColorDatabase.DEFAULT_RED;
+    private ColorEnum color = ColorEnum.RED;
     private float previousAlpha = 0.0f;
 
     private LayeredTextureWidget ltw;
@@ -32,7 +34,7 @@ public class LegendObject extends AbstractWidget<LegendObject> {
     public LegendObject() {
         ltw = new LayeredTextureWidget(WIDTH, HEIGHT)
                 .withLayer(MapMarksTextureDatabase.LEGEND_SHADOW.getTexture(), SHADOW_COLOR)
-                .withLayer(MapMarksTextureDatabase.LEGEND_BASE.getTexture(), baseColor)
+                .withLayer(MapMarksTextureDatabase.LEGEND_BASE.getTexture(), color.get())
                 .withLayer(MapMarksTextureDatabase.LEGEND_DIM.getTexture(), INVIS_COLOR)
                 .withLayer(MapMarksTextureDatabase.LEGEND_HIGHLIGHT.getTexture(), INVIS_COLOR)
                 .withLayer(MapMarksTextureDatabase.LEGEND_TRIM.getTexture(), ColorDatabase.UI_TRIM);
@@ -52,7 +54,7 @@ public class LegendObject extends AbstractWidget<LegendObject> {
     @Override public float getContentWidth() { return WIDTH; }
     @Override public float getContentHeight() { return HEIGHT; }
 
-    public Color getColor() { return baseColor; }
+    public ColorEnum getColor() { return color; }
 
     @Override
     public LegendObject anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
@@ -64,7 +66,7 @@ public class LegendObject extends AbstractWidget<LegendObject> {
     // TODO: could be a bug if we set the radial menu item before the thing is fully faded in maybe? may be perma dim (not thinking too hard here)
     public void setAlphaFromLegend(float alpha) {
         if (previousAlpha != alpha) {
-            ltw.withLayerColor(1, EaselColors.withOpacity(baseColor, alpha));
+            ltw.withLayerColor(1, EaselColors.withOpacity(color.get(), alpha));
             previousAlpha = alpha;
         }
     }
@@ -74,8 +76,8 @@ public class LegendObject extends AbstractWidget<LegendObject> {
         ltw.render(sb);
     }
 
-    public void setColor(Color color) {
-        this.baseColor = color;
-        ltw.withLayerColor(1, this.baseColor);
+    public void setColor(ColorEnum color) {
+        this.color = color;
+        ltw.withLayerColor(1, this.color.get());
     }
 }
