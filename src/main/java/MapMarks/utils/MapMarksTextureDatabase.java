@@ -6,8 +6,14 @@ import easel.utils.textures.ITextureDatabaseEnum;
 public enum MapMarksTextureDatabase implements ITextureDatabaseEnum {
     PAINT_CIRCLE("MapMarks/textures/circle18.png"),
 
-    LEGEND_BASE("MapMarks/textures/legend_base.png"),
-    LEGEND_TRIM("MapMarks/textures/legend_trim.png"),
+//    LEGEND_BASE("MapMarks/textures/legend_base.png"),
+//    LEGEND_TRIM("MapMarks/textures/legend_trim.png"),
+
+    LEGEND_SHADOW("MapMarks/textures/legend/shadow.png"),
+    LEGEND_BASE("MapMarks/textures/legend/base.png"),
+    LEGEND_HIGHLIGHT("MapMarks/textures/legend/highlight.png"),
+    LEGEND_DIM("MapMarks/textures/legend/dim.png"),
+    LEGEND_TRIM("MapMarks/textures/legend/trim.png"),
 
 //    MAP_TILE_BASE("MapMarks/textures/tile/base.png"),
 //    MAP_TILE_TRIM("MapMarks/textures/tile/trim.png"),

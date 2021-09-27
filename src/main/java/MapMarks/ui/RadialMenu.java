@@ -28,7 +28,7 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
     private ArrayList<RadialMenuObject> objects;
     private RadialMenuObject centerObject;
 
-    private static Color centerDefaultColor = EaselColors.fromHexString("8d8c80");
+    private static Color centerDefaultColor = Color.valueOf("8d8c80");
 
     int selectedIndex = -1;
 
