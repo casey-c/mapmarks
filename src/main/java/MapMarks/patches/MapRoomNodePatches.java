@@ -83,11 +83,17 @@ public class MapRoomNodePatches {
             clz = MapRoomNode.class,
             method = "render"
     )
-    public static class MapRoomNodeRenderFixOutlinesPatch {
-        public static void recolor(SpriteBatch sb, MapRoomNode node) {
+    public static class MapRoomNodeRenderRecolorPatch {
+        public static void recolorOutline(SpriteBatch sb, MapRoomNode node) {
             if (MapTileManager.isNodeHighlighted(node)) {
                 Color color = MapTileManager.getHighlightedNodeColor(node);
                 sb.setColor(color);
+//                sb.setColor(Color.WHITE);
+            }
+        }
+        public static void recolorBase(SpriteBatch sb, MapRoomNode node) {
+            if (MapTileManager.isNodeHighlighted(node)) {
+                sb.setColor(Color.BLACK);
             }
         }
 
@@ -95,7 +101,13 @@ public class MapRoomNodePatches {
                 +
                 "if ($1 == this.room.getMapImgOutline()) {"
                 +
-                MapRoomNodeRenderFixOutlinesPatch.class.getName() + ".recolor(sb, this);"
+                MapRoomNodeRenderRecolorPatch.class.getName() + ".recolorOutline(sb, this);"
+                +
+                "}"
+                +
+                "else if ($1 == this.room.getMapImg()) {"
+                +
+                MapRoomNodeRenderRecolorPatch.class.getName() + ".recolorBase(sb, this);"
                 +
                 "}"
                 +
