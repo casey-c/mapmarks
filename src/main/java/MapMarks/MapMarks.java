@@ -1,6 +1,7 @@
 package MapMarks;
 
 import MapMarks.ui.LegendObject;
+import MapMarks.ui.PaintContainer;
 import MapMarks.ui.RadialMenu;
 import MapMarks.utils.MapMarksTextureDatabase;
 import MapMarks.utils.SoundHelper;
@@ -18,6 +19,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.map.LegendItem;
 import easel.ui.AnchorPosition;
+import easel.utils.EaselInputHelper;
 import easel.utils.EaselSoundHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
@@ -39,6 +41,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
     }
 
     private RadialMenu menu;
+    private PaintContainer paintContainer;
 
     public static LegendObject legendObject;
 
@@ -52,7 +55,9 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
         legendObject = new LegendObject()
                 .onRightClick(onClick -> {
                     EaselSoundHelper.uiClick2();
+
                     MapTileManager.clearAllHighlights();
+                    paintContainer.clear();
                 })
                 .anchoredAt(1575, 767, AnchorPosition.CENTER)
         ;
@@ -61,11 +66,14 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
         System.out.println("Settings.yScale: " + Settings.yScale);
         System.out.println("Settings.scale: " + Settings.scale);
 
+        paintContainer = new PaintContainer();
     }
 
     @Override
     public void receiveRender(SpriteBatch sb) {
         menu.render(sb);
+
+        paintContainer.render(sb);
     }
 
     private boolean rightMouseDown = false;
@@ -77,6 +85,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
 
     private RightMouseDownMode rightMouseDownMode = RightMouseDownMode.NONE;
 
+
     @Override
     public void receivePostUpdate() {
         // No updates required if we're not on the map screen
@@ -87,6 +96,19 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
 
         // Update tile manager
         MapTileManager.updateAllTracked();
+
+        if (EaselInputHelper.isAltPressed()) {
+            paintContainer.update();
+
+            // Reset the remaining and quit early, since we don't want to highlight or open the radial in this mode
+            rightMouseDownMode = RightMouseDownMode.NONE;
+            rightMouseDown = false;
+
+            if (menu.isMenuOpen())
+                menu.close();
+
+            return;
+        }
 
         // Transition: Started right clicking
         if (InputHelper.isMouseDown_R && !rightMouseDown) {

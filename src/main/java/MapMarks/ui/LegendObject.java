@@ -31,6 +31,8 @@ public class LegendObject extends AbstractWidget<LegendObject> {
         return HEIGHT;
     }
 
+    public Color getColor() { return color; }
+
     @Override
     public LegendObject anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
         super.anchoredAt(x, y, anchorPosition, movementSpeed);
