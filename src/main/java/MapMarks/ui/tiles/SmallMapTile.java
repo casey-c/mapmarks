@@ -1,4 +1,4 @@
-package MapMarks.ui;
+package MapMarks.ui.tiles;
 
 import MapMarks.utils.ColorDatabase;
 import MapMarks.utils.MapMarksTextureDatabase;
@@ -9,10 +9,9 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 import easel.ui.graphics.LayeredTextureWidget;
-import easel.utils.EaselGraphicsHelper;
 import easel.utils.colors.EaselColors;
 
-public class MapTile extends AbstractWidget<MapTile> {
+public class SmallMapTile extends AbstractWidget<SmallMapTile> {
     // Not statically defined because I'm probably going to mess with the tile images a ton still
     // and prefer to keep them dynamically pulled from the texture
     public final float WIDTH;
@@ -23,16 +22,16 @@ public class MapTile extends AbstractWidget<MapTile> {
     private Color baseColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.2f);
     private static final Color trimColor = ColorDatabase.UI_TRIM;
 
-    public MapTile() {
-        Texture base = MapMarksTextureDatabase.MAP_TILE_BASE.getTexture();
+    public SmallMapTile() {
+        Texture base = MapMarksTextureDatabase.SMALL_TILE_BASE.getTexture();
 
         this.WIDTH = base.getWidth();
         this.HEIGHT = base.getHeight();
 
         this.ltw = new LayeredTextureWidget(WIDTH, HEIGHT)
-                .withLayer(MapMarksTextureDatabase.MAP_TILE_SHADOW.getTexture())
-                .withLayer(MapMarksTextureDatabase.MAP_TILE_BASE.getTexture(), baseColor)
-                .withLayer(MapMarksTextureDatabase.MAP_TILE_TRIM.getTexture(), trimColor)
+                .withLayer(MapMarksTextureDatabase.SMALL_TILE_SHADOW.getTexture())
+                .withLayer(MapMarksTextureDatabase.SMALL_TILE_BASE.getTexture(), baseColor)
+                .withLayer(MapMarksTextureDatabase.SMALL_TILE_TRIM.getTexture(), trimColor)
         ;
 
     }
@@ -52,7 +51,7 @@ public class MapTile extends AbstractWidget<MapTile> {
     @Override public float getContentHeight() { return HEIGHT; }
 
     @Override
-    public MapTile anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+    public SmallMapTile anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
         super.anchoredAt(x, y, anchorPosition, movementSpeed);
         ltw.anchoredAt(x, y, anchorPosition, movementSpeed);
         return this;

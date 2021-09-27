@@ -1,6 +1,7 @@
 package MapMarks.patches;
 
 import MapMarks.MapTileManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
@@ -9,8 +10,9 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.dungeons.TheEnding;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.screens.DungeonMapScreen;
-import easel.utils.EaselGraphicsHelper;
-import easel.utils.colors.EaselColors;
+import javassist.CannotCompileException;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 
 public class MapRoomNodePatches {
 
@@ -77,6 +79,42 @@ public class MapRoomNodePatches {
         }
     }
 
+    @SpirePatch(
+            clz = MapRoomNode.class,
+            method = "render"
+    )
+    public static class MapRoomNodeRenderFixOutlinesPatch {
+        public static void recolor(SpriteBatch sb, MapRoomNode node) {
+            if (MapTileManager.isNodeHighlighted(node)) {
+                Color color = MapTileManager.getHighlightedNodeColor(node);
+                sb.setColor(color);
+            }
+        }
+
+        public static String REPLACEMENT = "{ "
+                +
+                "if ($1 == this.room.getMapImgOutline()) {"
+                +
+                MapRoomNodeRenderFixOutlinesPatch.class.getName() + ".recolor(sb, this);"
+                +
+                "}"
+                +
+                "$_ = $proceed($$);"
+                +
+                " }";
+
+        public static ExprEditor Instrument() {
+            return new ExprEditor() {
+                @Override
+                public void edit(MethodCall m) throws CannotCompileException {
+                    if (m.getClassName().equals(SpriteBatch.class.getName()) && m.getMethodName().equals("draw")) {
+                        m.replace(REPLACEMENT);
+                    }
+                }
+            };
+        }
+    }
+
 
     @SpirePatch(
             clz = MapRoomNode.class,
@@ -89,58 +127,51 @@ public class MapRoomNodePatches {
         private static final float OFFSET_Y = 180.0f * Settings.scale;
 
         public static float computeXFromNode(MapRoomNode node) {
-            //return (node.x * SPACING_X + OFFSET_X - 64.0f + node.offsetX) + 64.0f * Settings.scale + (32.0f * Settings.scale);
-            //return (node.x * SPACING_X + OFFSET_X - 64.0f + node.offsetX) + 64.0f * Settings.scale;
-            //return (node.x * SPACING_X + OFFSET_X - 64.0f + node.offsetX);
             return (node.x * SPACING_X + OFFSET_X + node.offsetX) / Settings.xScale - 64.0f;
-
-//            sb.draw(this.room.getMapImg(),
-//                    (float)this.x * SPACING_X + OFFSET_X - 64.0f + this.offsetX,
-//                    (float)this.y * Settings.MAP_DST_Y + OFFSET_Y + DungeonMapScreen.offsetY - 64.0f + this.offsetY,
-//                    64.0f,
-//                    64.0f,
-//                    128.0f,
-//                    128.0f,
-//                    this.scale * Settings.scale,
-//                    this.scale * Settings.scale,
-//                    0.0f,
-//                    0,
-//                    0,
-//                    128,
-//                    128,
-//                    false,
-//                    false);
         }
 
         public static float computeYFromNode(MapRoomNode node) {
-            //return (node.y * Settings.MAP_DST_Y + OFFSET_Y + DungeonMapScreen.offsetY - 64.0f + node.offsetY) + 64.0f * Settings.scale;
-            //return (node.y * Settings.MAP_DST_Y + OFFSET_Y + DungeonMapScreen.offsetY - 64.0f + node.offsetY);
-
             return (node.y * Settings.MAP_DST_Y + OFFSET_Y + DungeonMapScreen.offsetY + node.offsetY) / Settings.yScale - 64.0f;
-//            return (node.y * Settings.MAP_DST_Y + OFFSET_Y + DungeonMapScreen.offsetY + node.offsetY) / Settings.scale - 64.0f;
-
-            //return (node.y * Settings.MAP_DST_Y + OFFSET_Y + DungeonMapScreen.offsetY - 64.0f + node.offsetY) + 64.0f * Settings.scale + (32.0f * Settings.scale);
         }
 
-        @SpirePostfixPatch
-        public static void Postfix(MapRoomNode node, SpriteBatch sb) {
-//            EaselGraphicsHelper.drawRect(sb, computeXFromNode(node) / Settings.xScale, computeYFromNode(node) / Settings.yScale, 64.0f, 64.0f, EaselColors.withOpacity(EaselColors.HEADER_BLUE(), 0.2f));
-
-//            EaselGraphicsHelper.drawRect(sb, computeXFromNode(node) / Settings.scale + 45.0f, computeYFromNode(node) / Settings.scale + 45.0f, 64.0f, 64.0f, EaselColors.withOpacity(EaselColors.HEADER_GREEN(), 0.2f));
-
-//            EaselGraphicsHelper.drawRect(sb, computeXFromNode(node) / Settings.scale, computeYFromNode(node) / Settings.scale, 128.0f * Settings.scale, 128.0f * Settings.scale, EaselColors.withOpacity(EaselColors.HEADER_PURPLE(), 0.2f));
-
-            // x and y definitely need to be xScale, yScale
-            // the offset is not correct and is probably resolution dependent
-
+        public static void handlePreEmeraldRender(SpriteBatch sb, MapRoomNode node) {
             MapTileManager.tryRender(sb,
                     node,
-//                    computeXFromNode(node) / Settings.xScale + 0.0f,
-//                    computeYFromNode(node) / Settings.yScale + 0.0f * Settings.scale / Settings.yScale);
                     computeXFromNode(node) + 32.0f,
                     computeYFromNode(node) + 32.0f
             );
         }
+
+        public static String PRE_EMERALD_VFX = "{ "
+                +
+                MapRoomNodeRenderPatch.class.getName() + ".handlePreEmeraldRender(sb, this);"
+                +
+                "$_ = $proceed($$);"
+                +
+                " }";
+
+        public static ExprEditor Instrument() {
+            return new ExprEditor() {
+                @Override
+                public void edit(MethodCall m) throws CannotCompileException {
+                    if (m.getClassName().equals(MapRoomNode.class.getName()) && m.getMethodName().equals("renderEmeraldVfx")) {
+                        m.replace(PRE_EMERALD_VFX);
+                    }
+                }
+            };
+        }
+
+//        @SpirePostfixPatch
+//        public static void Postfix(MapRoomNode node, SpriteBatch sb) {
+//            // x and y definitely need to be xScale, yScale
+//            // the offset is not correct and is probably resolution dependent
+//
+//            MapTileManager.tryRender(sb,
+//                    node,
+//                    computeXFromNode(node) + 32.0f,
+//                    computeYFromNode(node) + 32.0f
+//            );
+//        }
 //            // TODO: render just before this line (near the start of MapRoomNode::render)
 //            //   [will need an instrument patch probably]
 //            // this.renderEmeraldVfx(sb);

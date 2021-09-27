@@ -176,7 +176,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                     Color newColor = menu.getSelectedColorOrDefault();
                     legendObject.setColor(newColor);
 
-                    MapTileManager.setHighlightingColor(EaselColors.withOpacity(newColor, 0.2f));
+                    MapTileManager.setHighlightingColor(EaselColors.withOpacity(newColor, 0.8f));
 
                     previouslySelectedIndex = selectedIndex;
                 }
