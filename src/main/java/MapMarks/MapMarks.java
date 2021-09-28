@@ -119,7 +119,15 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
         if (InputHelper.isMouseDown_R && !rightMouseDown) {
             rightMouseDown = true;
 
-            if (MapTileManager.isAnyTileHovered()) {
+            // Control will clear any unreachable from the node under the target
+            if (EaselInputHelper.isControlPressed()) {
+                if (MapTileManager.isAnyTileHovered()) {
+                    MapTileManager.removeHighlightsFromUnreachableNodes();
+                    MapTileManager.setHoveredTileHighlightStatus(true);
+                    rightMouseDownMode = RightMouseDownMode.NONE;
+                }
+            }
+            else if (MapTileManager.isAnyTileHovered()) {
                 // Preexisting highlighted tile under cursor where we start clicking
                 if (MapTileManager.hoveredTileIsHighlighted()) {
                     // Check if we're doing a repaint (TODO: config option)

@@ -16,7 +16,6 @@ import easel.utils.colors.EaselColors;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MapTileManager {
     private enum RoomType {
@@ -163,18 +162,23 @@ public class MapTileManager {
 //        EaselGraphicsHelper.drawRect(sb, x, y, 64, 64, DebugWidget.DEBUG_COLOR_0);
     }
 
-    private static MapTileMapObject inbounds = null;
+//    private static MapTileMapObject inbounds = null;
+    private static MapRoomNode inboundsNode = null;
+    private static MapTileMapObject inboundsMapTileMapObject = null;
 
     public static void updateAllTracked() {
-        inbounds = null;
+        inboundsNode = null;
+        inboundsMapTileMapObject = null;
 
-        for (MapTileMapObject obj : tracked.values()) {
-            obj.smallTile.update();
-            obj.largeTile.update();
+//        for (MapTileMapObject obj : tracked.values()) {
+        for (Map.Entry<MapRoomNode, MapTileMapObject> entry : tracked.entrySet()) {
+            entry.getValue().smallTile.update();
+            entry.getValue().largeTile.update();
 
             // TODO: might need to verify that just checking against the small tile is fine here
-            if (obj.smallTile.isMouseInContentBounds()) {
-                inbounds = obj;
+            if (entry.getValue().smallTile.isMouseInContentBounds()) {
+                inboundsNode = entry.getKey();
+                inboundsMapTileMapObject = entry.getValue();
             }
         }
     }
@@ -236,28 +240,33 @@ public class MapTileManager {
             return;
 
         for (Map.Entry<MapRoomNode, MapTileMapObject> entry : tracked.entrySet()) {
-            entry.getValue().isReachable = reachableNodes.contains(entry.getKey());
+            if (entry.getKey() == currNode) {
+                entry.getValue().isReachable = false;
+            }
+            else {
+                entry.getValue().isReachable = reachableNodes.contains(entry.getKey());
+            }
         }
     }
 
     // --------------------------------------------------------------------------------
 
     public static boolean isAnyTileHovered() {
-        return inbounds != null;
+        return inboundsMapTileMapObject != null;
     }
 
     public static boolean hoveredTileIsHighlighted() {
-        return (inbounds != null && inbounds.isHighlighted);
+        return (inboundsMapTileMapObject != null && inboundsMapTileMapObject.isHighlighted);
     }
 
     public static void setHoveredTileHighlightStatus(boolean val) {
-        if (inbounds != null) {
+        if (inboundsMapTileMapObject != null) {
             // Changing highlight status always succeeds
-            if (inbounds.isHighlighted != val) {
-                inbounds.isHighlighted = val;
+            if (inboundsMapTileMapObject.isHighlighted != val) {
+                inboundsMapTileMapObject.isHighlighted = val;
 
-                inbounds.smallTile.setBaseColor(highlightingColor);
-                inbounds.largeTile.setBaseColor(highlightingColor);
+                inboundsMapTileMapObject.smallTile.setBaseColor(highlightingColor);
+                inboundsMapTileMapObject.largeTile.setBaseColor(highlightingColor);
 
                 SoundHelper.playMapScratchSound();
             }
@@ -265,8 +274,8 @@ public class MapTileManager {
             // TODO: config option? [enable instant repaint]
             else if (val && isARepaint()) {
                 //else if (val && inbounds.tile.getBaseColor() != highlightingColor) {
-                inbounds.smallTile.setBaseColor(highlightingColor);
-                inbounds.largeTile.setBaseColor(highlightingColor);
+                inboundsMapTileMapObject.smallTile.setBaseColor(highlightingColor);
+                inboundsMapTileMapObject.largeTile.setBaseColor(highlightingColor);
 
                 SoundHelper.playMapScratchSound();
             }
@@ -278,8 +287,8 @@ public class MapTileManager {
      */
     public static boolean isARepaint() {
         // TODO: verify that only the small tile is needed here
-        if (inbounds != null) {
-            return inbounds.smallTile.getBaseColor() != highlightingColor;
+        if (inboundsMapTileMapObject != null) {
+            return inboundsMapTileMapObject.smallTile.getBaseColor() != highlightingColor;
         }
         return false;
     }
@@ -375,10 +384,43 @@ public class MapTileManager {
         highlightAllType(val, RoomType.ELITE);
     }
 
-    //        this.items.add(new LegendItem(TEXT[6], ImageMaster.MAP_NODE_TREASURE, TEXT[7], TEXT[8], 2));
-//        this.items.add(new LegendItem(TEXT[9], ImageMaster.MAP_NODE_REST, TEXT[10], TEXT[11], 3));
-//        this.items.add(new LegendItem(TEXT[12], ImageMaster.MAP_NODE_ENEMY, TEXT[13], TEXT[14], 4));
-//        this.items.add(new LegendItem(TEXT[15], ImageMaster.MAP_NODE_ELITE, TEXT[16], TEXT[17], 5));
+    // --------------------------------------------------------------------------------
+
+    public static void removeHighlightsFromUnreachableNodes() {
+        MapRoomNode src = inboundsNode;
+
+        if (src == null)
+            return;
+
+
+        HashSet<MapRoomNode> reachableAboveSrc = reachableMap.get(src);
+
+        for (Map.Entry<MapRoomNode, MapTileMapObject> entry : tracked.entrySet()) {
+            // Don't care about unhighlighted nodes
+            if (!entry.getValue().isHighlighted)
+                continue;
+
+            // Check if this entry is reachable FROM the src node
+            if (reachableAboveSrc != null && reachableAboveSrc.contains(entry.getKey()))
+                continue;
+
+            // Check if this entry reaches TO the src node
+            HashSet<MapRoomNode> reachable = reachableMap.get(entry.getKey());
+
+            if (reachable != null && reachable.contains(src))
+                continue;
+
+            // Otherwise, we need to clear the highlight
+            entry.getValue().isHighlighted = false;
+        }
+
+        // Make sure the src node remains (or becomes) highlighted
+//        if (inboundsMapTileMapObject != null)
+//            inboundsMapTileMapObject.isHighlighted = true;
+    }
+
+    // --------------------------------------------------------------------------------
+
     public static void clear() {
         tracked.clear();
     }

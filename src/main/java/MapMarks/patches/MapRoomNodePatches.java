@@ -1,5 +1,6 @@
 package MapMarks.patches;
 
+import MapMarks.MapMarks;
 import MapMarks.MapTileManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -42,6 +43,7 @@ public class MapRoomNodePatches {
             method = "generateMap"
     )
     public static class PostGenerateDungeonPatch {
+        @SpirePostfixPatch
         public static void Postfix() {
             MapTileManager.clear();
 
@@ -51,6 +53,20 @@ public class MapRoomNodePatches {
             }));
 
             MapTileManager.initializeReachableMap();
+            MapTileManager.computeReachable();
+        }
+    }
+
+    @SpirePatch(
+            clz = AbstractDungeon.class,
+            method = "populatePathTaken"
+    )
+    public static class PostPopulatePathTakenPatch {
+        // This patch is to make sure we compute reachable after loading in from a save file
+        // This function probably isn't the best place to patch it in, but it works so whatever
+        @SpirePostfixPatch
+        public static void Postfix() {
+            MapTileManager.computeReachable();
         }
     }
 
@@ -88,14 +104,17 @@ public class MapRoomNodePatches {
     public static class MapRoomNodeRenderRecolorPatch {
         public static void recolorOutline(SpriteBatch sb, MapRoomNode node) {
             if (MapTileManager.isNodeHighlighted(node)) {
-                Color color = MapTileManager.getHighlightedNodeColor(node);
-                sb.setColor(color);
-//                sb.setColor(Color.WHITE);
+                if (MapMarks.legendObject.isMouseInBounds() || MapTileManager.isNodeReachable(node)) {
+                    Color color = MapTileManager.getHighlightedNodeColor(node);
+                    sb.setColor(color);
+                }
             }
         }
         public static void recolorBase(SpriteBatch sb, MapRoomNode node) {
             if (MapTileManager.isNodeHighlighted(node)) {
-                sb.setColor(Color.BLACK);
+                if (MapMarks.legendObject.isMouseInBounds() || MapTileManager.isNodeReachable(node)) {
+                    sb.setColor(Color.BLACK);
+                }
             }
         }
 
@@ -235,15 +254,28 @@ public class MapRoomNodePatches {
 //        }
     }
 
+    // note: this didn't work in every case, trying something else
+//    @SpirePatch(
+//            clz = MapRoomNode.class,
+//            method = "playNodeSelectedSound"
+//    )
+//    public static class MapRoomNodeReachabilityPatch {
+//        @SpirePostfixPatch
+//        public static void Postfix(MapRoomNode _node) {
+//            MapTileManager.computeReachable();
+//        }
+//
+//    }
+
+    //    public static void setCurrMapNode(MapRoomNode currMapNode)
     @SpirePatch(
-            clz = MapRoomNode.class,
-            method = "playNodeSelectedSound"
+            clz = AbstractDungeon.class,
+            method = "setCurrMapNode"
     )
     public static class MapRoomNodeReachabilityPatch {
         @SpirePostfixPatch
-        public static void Postfix(MapRoomNode _node) {
+        public static void Postfix(MapRoomNode _currMapNode) {
             MapTileManager.computeReachable();
         }
-
     }
 }
