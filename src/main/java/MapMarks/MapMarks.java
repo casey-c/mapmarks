@@ -57,8 +57,12 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                 .onRightClick(onClick -> {
                     EaselSoundHelper.uiClick2();
 
-                    MapTileManager.clearAllHighlights();
-                    paintContainer.clear();
+                    if (EaselInputHelper.isAltPressed()) {
+                        paintContainer.clear();
+                    }
+                    else {
+                        MapTileManager.clearAllHighlights();
+                    }
                 })
                 .anchoredAt(1575, 767, AnchorPosition.CENTER)
         ;

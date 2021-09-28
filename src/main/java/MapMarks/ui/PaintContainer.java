@@ -90,7 +90,7 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
             float distance = (float)Math.sqrt(a * a + b * b);
 
             if (distance > INTERPOLATION_DIST_THRESHOLD) {
-                int numberOfBlobsToAdd = Math.round(distance / BLOB_SIZE) * 3; // TODO: 4 might be overkill, should test more
+                int numberOfBlobsToAdd = Math.round(distance / BLOB_SIZE) * 3;
 
                 for (int i = 0; i < numberOfBlobsToAdd; ++i) {
                     float percentAlongVector = (float)i / (float)numberOfBlobsToAdd;
