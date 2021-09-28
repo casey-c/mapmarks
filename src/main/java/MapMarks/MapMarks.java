@@ -48,7 +48,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
 
     @Override
     public void receivePostInitialize() {
-        logger.info("Hello, world");
+//        logger.info("Hello, world");
         TextureLoader.loadTextures(MapMarksTextureDatabase.values());
         //Easel.initialize();
 
@@ -67,9 +67,9 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                 .anchoredAt(1575, 767, AnchorPosition.CENTER)
         ;
 
-        System.out.println("Settings.xScale: " + Settings.xScale);
-        System.out.println("Settings.yScale: " + Settings.yScale);
-        System.out.println("Settings.scale: " + Settings.scale);
+//        System.out.println("Settings.xScale: " + Settings.xScale);
+//        System.out.println("Settings.yScale: " + Settings.yScale);
+//        System.out.println("Settings.scale: " + Settings.scale);
 
         paintContainer = new PaintContainer();
     }
@@ -180,7 +180,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
                 menu.close();
                 SoundHelper.playRadialCloseSound();
 
-                System.out.println("Menu closed. Selected index is: " + menu.getSelectedIndex());
+//                System.out.println("Menu closed. Selected index is: " + menu.getSelectedIndex());
 
                 // Update the results with the new selection
                 int selectedIndex = menu.getSelectedIndex();

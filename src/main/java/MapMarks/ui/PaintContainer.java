@@ -99,14 +99,14 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
                     float targetX = lastX + percentAlongVector * a;
                     float targetY = lastY + percentAlongVector * b;
 
-                    blobs.add(new PaintBlob(targetX, targetY, DungeonMapScreen.offsetY, color));
+                    blobs.add(new PaintBlob(targetX, targetY, DungeonMapScreen.offsetY / Settings.scale, color));
                 }
             }
         }
 
         blobs.add(new PaintBlob(cx,
                 cy,
-                DungeonMapScreen.offsetY,
+                DungeonMapScreen.offsetY / Settings.scale,
                 color));
 
         // Store the current position for next blob add
@@ -151,7 +151,7 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
             float currOffset = DungeonMapScreen.offsetY;
 
             for (PaintBlob blob : blobs) {
-                blob.render(sb, currOffset);
+                blob.render(sb, currOffset / Settings.scale);
             }
         }
     }

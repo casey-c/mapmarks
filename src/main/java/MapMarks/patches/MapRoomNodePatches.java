@@ -46,6 +46,7 @@ public class MapRoomNodePatches {
         @SpirePostfixPatch
         public static void Postfix() {
             MapTileManager.clear();
+            MapMarks.paintContainer.clear();
 
             AbstractDungeon.map.forEach(list -> list.forEach(node -> {
                 if (node.x >= 0 && node.y >= 0 && !node.getEdges().isEmpty())
@@ -77,6 +78,7 @@ public class MapRoomNodePatches {
     public static class PostEndingGenerateDungeonPatch {
         public static void Postfix() {
             MapTileManager.clear();
+            MapMarks.paintContainer.clear();
 
             AbstractDungeon.map.forEach(list -> list.forEach(node -> {
                 if (node.x >= 0 && node.y >= 0)
@@ -85,17 +87,17 @@ public class MapRoomNodePatches {
         }
     }
 
-    @SpirePatch(
-            clz = MapRoomNode.class,
-            method = "update"
-    )
-    public static class MapRoomNodeUpdatePatch {
-        @SpirePostfixPatch
-        public static void Postfix(MapRoomNode node) {
-            // use this node as a key into our UI storage map, and update the map tile accordingly.
-            // if this node's node.hb is hovered, disable the radial menu from being openable, start tracking global rightclick/drags
-        }
-    }
+//    @SpirePatch(
+//            clz = MapRoomNode.class,
+//            method = "update"
+//    )
+//    public static class MapRoomNodeUpdatePatch {
+//        @SpirePostfixPatch
+//        public static void Postfix(MapRoomNode node) {
+//            // use this node as a key into our UI storage map, and update the map tile accordingly.
+//            // if this node's node.hb is hovered, disable the radial menu from being openable, start tracking global rightclick/drags
+//        }
+//    }
 
     @SpirePatch(
             clz = MapRoomNode.class,

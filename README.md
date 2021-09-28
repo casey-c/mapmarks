@@ -28,7 +28,7 @@ You can
 
     right-click
 
-the color indicator to the left of the "Legend" text to remove all current highlighting. In the future, this color indicator will also have a tool-tip describing how to work the mod, and perhaps have some more visual cues for which mode you're currently using.
+the color indicator to the left of the "Legend" text to remove all current highlighting. Holding SHIFT while mousing over this box also includes some in-game help on how to use the mod.
 
 ### Multicolor Highlighting
 Use a radial selection menu to choose the current color. This menu can be used by 
@@ -47,19 +47,38 @@ Quickly enable / disable the highlights of all nodes of a certain type by **righ
 
 ![legend toggle](.github/legend.png)
 
-## Planned Features
+### Drawing
 
-This is an on-going project (hopefully), so there are a few features I'm still working on for the initial real release:
+You can paint directly onto the map with 
 
-* Better graphics (the initial map highlight tiles are unfinished visually)
-* In-game help (a tool-tip for the clear button on the Legend)
-* Multiple visual modes (a square tile, a surrounding circle like "Highlight Paths", a surrounding square like "Better Paths", etc.) beyond just the default
-* A "free-pen" mode, inspired by the "Spire with Friends" mod. You'll be able to draw directly on the map in addition to highlighting nodes.
-* Automatically hiding "unreachable" nodes (no need to highlight an unreachable floor behind you or impossible to get to without wing boots - unless you have wing boot charges, of course)
+    Alt+Right+Click+Drag
 
-Lower priority features (perhaps after the workshop release):
-* Customizable colors
-* Better config options (being able to change the behavior of when to start repainting, hiding unreachable nodes flag, ...???)
+All paint can be cleared by Alt+Right+Clicking the legend button. 
+
+Note that there isn't an undo button because there are no mistakes: only happy accidents.
+
+![drawing](.github/drawing.png)
+
+### Additional Features
+
+* Quickly hide unreachable nodes. You can mouse over a node and:
+
+
+    Control + Right + Click
+
+the node to remove any highlights from nodes that cannot path through this target node. An example use of this feature is to Right+Click the Elite legend item to highlight all elites, and then Control+Right+Click the Super Elite to show ONLY the elites that you can receive with a path that collects the emerald key.
+
+* Unreachable nodes are automatically hidden once you choose a path. So if you highlight something that becomes no longer reachable once you move in a certain direction, it will no longer clutter your screen visually. You can mouse over the legend button to temporarily show these unreachable, but still highlighted nodes.
+
+### Known issues
+
+* Probably not compatible with the Colored Map or Dark Map mods, now that I have a patch to change the colored borders for my tiles to look okay. These will hopefully be fixed eventually, but for now please let me know how usable/unusable they actually are because I haven't done any testing yet!
+
+* The tiles are a bit out of position for unusual resolutions (e.g. super square or super wide). It's still usable, but I sorta gave up trying to make the scaling work correctly while keeping 1080p a primary focus. So it's a little ugly for those.
+
+* Winged boots are not taken into account for the unreachable node computations (yet). Planning on fixing this before the first major release.
+
+* The radial menu pops up when closing the [InfoMod2](https://github.com/casey-c/infomod2) events overlay screen. Eventually I will port InfoMod into my Easel library and have it be more seamless, but we're not there yet.
 
 ## Installation
 
