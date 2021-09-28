@@ -37,6 +37,8 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
     private int startX;
     private int startY;
 
+    private ColorEnum initialColorWhenOpened = ColorEnum.RED;
+
     public RadialMenu() {
         objects = new ArrayList<>(
 //                Arrays.asList(
@@ -80,8 +82,13 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
         centerObject = new RadialMenuObject(centerDefaultColor);
     }
 
+
     public void open() {
         isOpen = true;
+
+        if (selectedIndex != -1) {
+            initialColorWhenOpened = objects.get(selectedIndex).getColor();
+        }
 
         selectedIndex = -1;
 
@@ -107,7 +114,8 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
         if (selectedIndex != -1) {
             return objects.get(selectedIndex).getColor();
         } else {
-            return objects.get(1).getColor();
+            //return objects.get(1).getColor();
+            return initialColorWhenOpened;
         }
     }
 
@@ -210,6 +218,9 @@ public class RadialMenu extends AbstractWidget<RadialMenu> {
 //                centerObject.setBaseColor(centerDefaultColor);
                 objects.forEach(object -> object.setDimmed(false));
                 selectedIndex = -1;
+
+                // Reset to the initial color when opened
+                MapMarks.legendObject.setColor(initialColorWhenOpened);
             }
 
         }

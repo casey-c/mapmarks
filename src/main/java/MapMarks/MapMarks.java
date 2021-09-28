@@ -42,7 +42,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
     }
 
     private RadialMenu menu;
-    private PaintContainer paintContainer;
+    public static PaintContainer paintContainer;
 
     public static LegendObject legendObject;
 
@@ -78,7 +78,7 @@ public class MapMarks implements PostInitializeSubscriber, PostUpdateSubscriber,
     public void receiveRender(SpriteBatch sb) {
         menu.render(sb);
 
-        paintContainer.render(sb);
+//        paintContainer.render(sb);
     }
 
     private boolean rightMouseDown = false;

@@ -3,6 +3,7 @@ package MapMarks;
 import MapMarks.ui.tiles.LargeMapTile;
 import MapMarks.ui.tiles.SmallMapTile;
 import MapMarks.utils.ColorDatabase;
+import MapMarks.utils.ColorEnum;
 import MapMarks.utils.SoundHelper;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -293,7 +294,8 @@ public class MapTileManager {
         return false;
     }
 
-    private static Color highlightingColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.8f);
+    //private static Color highlightingColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.8f);
+    private static Color highlightingColor = ColorEnum.RED.get();
 
     public static void setHighlightingColor(Color color) {
         highlightingColor = color;

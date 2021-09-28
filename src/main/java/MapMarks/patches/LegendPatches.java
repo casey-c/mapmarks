@@ -54,4 +54,16 @@ public class LegendPatches {
             }
         }
     }
+
+    // Renders the paint container
+    @SpirePatch(
+            clz = Legend.class,
+            method = "render"
+    )
+    public static class LegendRenderPaintPatch {
+        @SpirePostfixPatch
+        public static void Postfix(Legend _legend, SpriteBatch sb) {
+            MapMarks.paintContainer.render(sb);
+        }
+    }
 }

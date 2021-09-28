@@ -28,8 +28,9 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
         Color color;
 
         public PaintBlob(float x, float y, float dungeonMapOffsetY, Color color) {
-            this.x = x;
-            this.y = y;
+            // hardcoded offset based on eyeballing it (might break with resolution scaling)
+            this.x = x - 11;
+            this.y = y - 2;
             this.dungeonMapOffsetY = dungeonMapOffsetY;
 
             this.color = color;

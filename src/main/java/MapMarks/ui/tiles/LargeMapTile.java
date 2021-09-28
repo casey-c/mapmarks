@@ -2,6 +2,7 @@ package MapMarks.ui.tiles;
 
 
 import MapMarks.utils.ColorDatabase;
+import MapMarks.utils.ColorEnum;
 import MapMarks.utils.MapMarksTextureDatabase;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,7 +21,8 @@ public class LargeMapTile extends AbstractWidget<LargeMapTile> {
 
     private LayeredTextureWidget ltw;
 
-    private Color baseColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.2f);
+//    private Color baseColor = EaselColors.withOpacity(ColorDatabase.DEFAULT_RED, 0.2f);
+    private Color baseColor = ColorEnum.RED.get();
 
     private static final Color trimColor = ColorDatabase.UI_TRIM;
 
