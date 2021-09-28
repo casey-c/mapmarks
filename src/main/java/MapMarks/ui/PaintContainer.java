@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class PaintContainer extends AbstractWidget<PaintContainer> {
     private static final Texture TEX_CIRCLE = MapMarksTextureDatabase.PAINT_CIRCLE.getTexture();
-    private static final float SCALE = 18.0f;
+    private static final float BLOB_SIZE = 18.0f;
 
     private static class PaintBlob {
         float x;
@@ -55,15 +55,14 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
         public void render(SpriteBatch sb, float currentDungeonMapOffsetY) {
             sb.setColor(color);
 
-            // TODO, these are all temporary and incorrect
             float sx = x;
             float sy = y - (dungeonMapOffsetY - currentDungeonMapOffsetY);
 
             sb.draw(TEX_CIRCLE,
                     sx * Settings.xScale,
                     sy * Settings.yScale,
-                    SCALE * Settings.xScale,
-                    SCALE * Settings.yScale);
+                    BLOB_SIZE * Settings.xScale,
+                    BLOB_SIZE * Settings.yScale);
         }
     }
 
@@ -73,11 +72,45 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
         anchoredAt(0, 0, AnchorPosition.LEFT_BOTTOM);
     }
 
+    private float lastX = -1.0f;
+    private float lastY = -1.0f;
+
+    private static final float INTERPOLATION_DIST_THRESHOLD = 10.0f; // 10px, should tweak
+
     private void addBlob(Color color) {
-        blobs.add(new PaintBlob(EaselInputHelper.getMouseX(),
-                EaselInputHelper.getMouseY(),
+        float cx = EaselInputHelper.getMouseX();
+        float cy = EaselInputHelper.getMouseY();
+
+        // Interpolate only if we had a real last mouse position
+        if (lastX >= 0.0f) {
+
+            float a = cx - lastX;
+            float b = cy - lastY;
+
+            float distance = (float)Math.sqrt(a * a + b * b);
+
+            if (distance > INTERPOLATION_DIST_THRESHOLD) {
+                int numberOfBlobsToAdd = Math.round(distance / BLOB_SIZE) * 3; // TODO: 4 might be overkill, should test more
+
+                for (int i = 0; i < numberOfBlobsToAdd; ++i) {
+                    float percentAlongVector = (float)i / (float)numberOfBlobsToAdd;
+
+                    float targetX = lastX + percentAlongVector * a;
+                    float targetY = lastY + percentAlongVector * b;
+
+                    blobs.add(new PaintBlob(targetX, targetY, DungeonMapScreen.offsetY, color));
+                }
+            }
+        }
+
+        blobs.add(new PaintBlob(cx,
+                cy,
                 DungeonMapScreen.offsetY,
                 color));
+
+        // Store the current position for next blob add
+        lastX = cx;
+        lastY = cy;
     }
 
     public void clear() {
@@ -94,8 +127,11 @@ public class PaintContainer extends AbstractWidget<PaintContainer> {
     protected void updateWidget() {
         if (CardCrawlGame.isInARun() && AbstractDungeon.screen == AbstractDungeon.CurrentScreen.MAP) {
             // Only active if we're in a run, on the map screen, and have ALT+RIGHT_CLICK pressed
-            if (!EaselInputHelper.isAltPressed() || !InputHelper.isMouseDown_R)
+            if (!EaselInputHelper.isAltPressed() || !InputHelper.isMouseDown_R) {
+                // Reset so our next paint call is fresh and won't be interpolated from garbage
+                lastX = -1.0f;
                 return;
+            }
 
             long currTime = System.currentTimeMillis();
 
