@@ -7,13 +7,16 @@ import MapMarks.utils.SoundHelper;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.map.MapEdge;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import easel.ui.AnchorPosition;
 import easel.utils.EaselSoundHelper;
 import easel.utils.colors.EaselColors;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MapTileManager {
     private enum RoomType {
@@ -49,6 +52,7 @@ public class MapTileManager {
         RoomType type;
 
         boolean isHighlighted = false;
+        boolean isReachable = true;
 
         public MapTileMapObject(MapRoomNode node) {
             this.type = RoomType.fromSymbol(node.getRoomSymbol(true));
@@ -108,6 +112,16 @@ public class MapTileManager {
             return false;
     }
 
+    public static boolean isNodeReachable(MapRoomNode node) {
+        MapTileMapObject tileObject = tracked.get(node);
+        if (tileObject != null)
+            return tileObject.isReachable;
+        else
+            return false;
+    }
+
+
+
     public static Color getHighlightedNodeColor(MapRoomNode node) {
         MapTileMapObject tileObject = tracked.get(node);
 
@@ -138,7 +152,7 @@ public class MapTileManager {
             tileObject.smallTile.anchoredAt(x - 5, y - 13, AnchorPosition.LEFT_BOTTOM);
 
             // Render either the large or small tile based on the scale
-            if (tileObject.isHighlighted) {
+            if (tileObject.isHighlighted && tileObject.isReachable) {
                 if (shouldRenderLarge(node))
                     tileObject.largeTile.render(sb);
                 else
@@ -164,6 +178,69 @@ public class MapTileManager {
             }
         }
     }
+
+    // --------------------------------------------------------------------------------
+
+    private static HashMap<MapRoomNode, HashSet<MapRoomNode>> reachableMap = new HashMap<>();
+
+    // Collects all the map room nodes directly reachable from node from its .getEdges() list
+    private static ArrayList<MapRoomNode> collectDirectChildren(MapRoomNode node, HashMap<Pair<Integer, Integer>, MapRoomNode> allNodes) {
+        ArrayList<MapRoomNode> results = new ArrayList<>();
+
+        for (MapEdge edge : node.getEdges()) {
+            MapRoomNode child = allNodes.get(Pair.of(edge.dstX, edge.dstY));
+            if (child != null)
+                results.add(child);
+        }
+
+        return results;
+    }
+
+    public static void initializeReachableMap() {
+        reachableMap.clear();
+
+        // For convenience, we make a map that lets us get a node just by its node.x, node.y position (since edges don't store nodes)
+        HashMap<Pair<Integer, Integer>, MapRoomNode> allNodesById = new HashMap<>();
+        tracked.keySet().forEach(node -> allNodesById.put(Pair.of(node.x, node.y), node));
+
+        // Now we compute reachability by using some BFS-like algorithm
+        // Note: could make this more efficient probably but I really didn't think too hard here
+        for (MapRoomNode node : tracked.keySet()) {
+            reachableMap.putIfAbsent(node, new HashSet<>());
+            HashSet<MapRoomNode> reachableFromStarterNode = reachableMap.get(node);
+
+            // Initialize the queue to have the direct descendants
+            Queue<MapRoomNode> queue = new ArrayDeque<>(collectDirectChildren(node, allNodesById));
+
+            // BFS to build up all reachable from this src node
+            while (!queue.isEmpty()) {
+                MapRoomNode next = queue.remove();
+
+                if (!reachableFromStarterNode.contains(next)) {
+                    reachableFromStarterNode.add(next);
+                    queue.addAll(collectDirectChildren(next, allNodesById));
+                }
+            }
+        }
+    }
+
+    public static void computeReachable() {
+        MapRoomNode currNode = AbstractDungeon.getCurrMapNode();
+
+        if (currNode == null)
+            return;
+
+        HashSet<MapRoomNode> reachableNodes = reachableMap.get(currNode);
+
+        if (reachableNodes == null || reachableNodes.isEmpty())
+            return;
+
+        for (Map.Entry<MapRoomNode, MapTileMapObject> entry : tracked.entrySet()) {
+            entry.getValue().isReachable = reachableNodes.contains(entry.getKey());
+        }
+    }
+
+    // --------------------------------------------------------------------------------
 
     public static boolean isAnyTileHovered() {
         return inbounds != null;

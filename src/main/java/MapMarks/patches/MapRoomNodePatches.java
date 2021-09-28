@@ -46,9 +46,11 @@ public class MapRoomNodePatches {
             MapTileManager.clear();
 
             AbstractDungeon.map.forEach(list -> list.forEach(node -> {
-                if (node.x >= 0 && node.y >= 0)
+                if (node.x >= 0 && node.y >= 0 && !node.getEdges().isEmpty())
                     MapTileManager.track(node);
             }));
+
+            MapTileManager.initializeReachableMap();
         }
     }
 
@@ -231,5 +233,17 @@ public class MapRoomNodePatches {
 //                }
 //            };
 //        }
+    }
+
+    @SpirePatch(
+            clz = MapRoomNode.class,
+            method = "playNodeSelectedSound"
+    )
+    public static class MapRoomNodeReachabilityPatch {
+        @SpirePostfixPatch
+        public static void Postfix(MapRoomNode _node) {
+            MapTileManager.computeReachable();
+        }
+
     }
 }
